@@ -1,0 +1,225 @@
+name: Build & Release (Android armv8 + Web)
+
+# NEON ECHO — CI pipeline.
+#
+# What it does:
+#   1. Builds a debug-signed armv8 (arm64) Android APK using the GameMaker CLI (igor).
+#   2. Builds the HTML5 (web) export and zips it.
+#   3. Publishes the web build to GitHub Pages.
+#   4. Creates a GitHub Release tagged like "v2026.1108" (or from an existing tag)
+#      and uploads BOTH the armv8 APK and the web ZIP to that same release.
+#
+# Requirements (see README.md "CI setup"):
+#   - A GameMaker installation with the command-line build tool on the runner,
+#     OR a Docker image that ships `igor` (the GameMaker CLI).
+#   - A GitHub secret for the GameMaker entitlement/license if your image needs one:
+#     GMS_LICENSE  (optional, only if your runner/image requires it).
+#
+# The `igor` CLI (GameMaker 2024.2+ / LTS) build syntax used here:
+#   igor --yyp="<project>.yyp" --target=<Target> --config="<config>" run
+#
+# NOTE: GameMaker "debug" Android configs are signed with the IDE's bundled
+# debug keystore automatically, which is exactly the "debug sign" this repo asks for.
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. v2026.1108)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write      # upload release assets
+  pages: write         # deploy GitHub Pages
+  id-token: write      # OIDC for Pages deployment
+
+env:
+  PROJECT_YYP: neon-echo.yyp
+  WEB_ZIP_NAME: neon-echo-web.zip
+  APK_NAME: NeonEcho-armv8-debug.apk
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Android — debug-signed armv8 APK
+  # ---------------------------------------------------------------------------
+  build-android:
+    name: Build Android (armv8, debug-signed)
+    runs-on: ubuntu-latest
+    # If you use a self-hosted runner with GameMaker + Android SDK already
+    # installed, drop the `container:` block and use it directly.
+    container:
+      # Swap this for your GameMaker CLI image (e.g. a self-built image that
+      # bundles `igor`, the Android SDK + NDK, and your license).
+      image: ghcr.io/your-org/gamemaker-ci:latest
+      options: --user root
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    env:
+      # Pass the license if your image needs to activate at build time.
+      GMS_LICENSE: ${{ secrets.GMS_LICENSE }}
+      ANDROID_KEYSTORE: debug.keystore        # bundled debug keystore
+      ANDROID_KEYSTORE_PASS: android          # default debug keystore password
+      ANDROID_KEY_ALIAS: androiddebugkey      # default debug alias
+      ANDROID_KEY_PASS: android               # default debug key password
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build armv8 debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          igor \
+            --yyp="${{ github.workspace }}/${{ env.PROJECT_YYP }}" \
+            --target="android" \
+            --config="armv8|debug" \
+            run
+          # Locate the produced APK; GameMaker writes under the project's
+          # "android" or a build-output directory depending on version.
+          APK_DIR="$(find . -type d -name 'default' -path '*android*' | head -n 1 || true)"
+          if [ -z "$APK_DIR" ]; then APK_DIR="android/armv8"; fi
+          APK="$(find "$APK_DIR" -name '*.apk' | head -n 1)"
+          if [ -z "$APK" ]; then
+            echo "Could not locate APK. Listing build dirs:"; find . -name '*.apk'
+            exit 1
+          fi
+          cp "$APK" "${{ env.APK_NAME }}"
+          echo "APK=$(pwd)/${{ env.APK_NAME }}" >> "$GITHUB_ENV"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-armv8-debug
+          path: ${{ env.APK_NAME }}
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # 2. Web — HTML5 export (zipped)
+  # ---------------------------------------------------------------------------
+  build-web:
+    name: Build Web (HTML5)
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/your-org/gamemaker-ci:latest
+      options: --user root
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    env:
+      GMS_LICENSE: ${{ secrets.GMS_LICENSE }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build HTML5
+        shell: bash
+        run: |
+          set -euo pipefail
+          igor \
+            --yyp="${{ github.workspace }}/${{ env.PROJECT_YYP }}" \
+            --target="HTML5" \
+            --config="default" \
+            run
+          # HTML5 output: index.html + html5game/ directory (default GameMaker naming)
+          HTML_DIR="$(find "${{ github.workspace }}" -type f -name index.html -not -path '*/.git/*' | head -n1 | xargs dirname)"
+          echo "HTML_DIR=$HTML_DIR" >> "$GITHUB_ENV"
+          cd "$HTML_DIR"
+          zip -r "${{ github.workspace }}/${{ env.WEB_ZIP_NAME }}" .
+
+      - name: Upload web ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web
+          path: ${{ env.WEB_ZIP_NAME }}
+          if-no-files-found: error
+
+      - name: Upload Pages artifact (expanded site)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ env.HTML_DIR }}
+
+  # ---------------------------------------------------------------------------
+  # 3. GitHub Pages deploy
+  # ---------------------------------------------------------------------------
+  deploy-pages:
+    name: Deploy web to GitHub Pages
+    needs: build-web
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # ---------------------------------------------------------------------------
+  # 4. Release — publish APK + web ZIP together
+  # ---------------------------------------------------------------------------
+  release:
+    name: Publish release (APK + web ZIP)
+    needs: [build-android, build-web]
+    runs-on: ubuntu-latest
+    # Only create a release on version tags, or explicitly via workflow_dispatch.
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    outputs:
+      upload_url: ${{ steps.release.outputs.upload_url }}
+    steps:
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: android-armv8-debug
+          path: dist
+
+      - name: Download web ZIP
+        uses: actions/download-artifact@v4
+        with:
+          name: web
+          path: dist
+
+      - name: Determine release tag & version
+        id: meta
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            TAG="${{ github.event.inputs.version }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            TAG="v$(date +%Y.%m.%d)-${{ github.run_number }}"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        id: release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: "NEON ECHO — ${{ steps.meta.outputs.version }}"
+          body: |
+            # NEON ECHO — ${{ steps.meta.outputs.version }}
+
+            A 2D cyberpunk story in five episodes. Vector-art only; no bitmap assets.
+
+            ## Downloads
+            - **Android (armv8, debug-signed)** — `${{ env.APK_NAME }}`
+            - **Web build** — `${{ env.WEB_ZIP_NAME }}` (also live on GitHub Pages)
+
+            ## Also deployed to GitHub Pages
+            https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+          files: |
+            dist/${{ env.APK_NAME }}
+            dist/${{ env.WEB_ZIP_NAME }}
+          generate_release_notes: true

@@ -1,0 +1,13 @@
+# GameMaker generated / build output
+*.exe
+*.app
+*.apk
+*.aab
+*.zip
+options/windows/
+options/android/
+options/ios/
+options/html5/
+options/tv/
+options/linux/
+options/opera/

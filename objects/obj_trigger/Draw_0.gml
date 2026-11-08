@@ -1,0 +1,1 @@
+// obj_trigger — DRAW unused; rendering via render().

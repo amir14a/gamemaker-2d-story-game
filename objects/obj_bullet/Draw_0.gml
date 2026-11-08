@@ -1,0 +1,1 @@
+// obj_bullet — DRAW unused; rendering via render().

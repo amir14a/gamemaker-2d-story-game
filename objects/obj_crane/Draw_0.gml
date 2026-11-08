@@ -1,0 +1,1 @@
+// obj_crane — DRAW unused; rendering via render().
