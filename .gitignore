@@ -4,10 +4,14 @@
 *.apk
 *.aab
 *.zip
+# CI artifacts (generated inside the GitHub runner, never committed)
+gm-options.json
+.gmcache/
+# Unused target options (only options/android/ + options/main/ are tracked)
 options/windows/
-options/android/
 options/ios/
-options/html5/
-options/tv/
+options/tvos/
 options/linux/
 options/opera/
+options/winuwp/
+options/amazonfire/

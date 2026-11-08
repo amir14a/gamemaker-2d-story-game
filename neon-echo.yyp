@@ -204,6 +204,11 @@
    "name": "Main",
    "path": "options/main/options_main.yy",
    "order": 1
+  },
+  {
+   "name": "Android",
+   "path": "options/android/options_android.yy",
+   "order": 2
   }
  ],
  "defaultScriptType": 1,

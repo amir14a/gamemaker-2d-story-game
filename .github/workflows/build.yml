@@ -2,24 +2,20 @@ name: Build & Release (Android armv8 + Web)
 
 # NEON ECHO — CI pipeline.
 #
+# Uses the OFFICIAL open-source GameMaker CLI: `@gamemaker/gm-cli` (Apache-2.0,
+# published by YoYoGames/Opera). It runs on stock GitHub `ubuntu-latest` runners
+# and downloads Igor + the GameMaker runtime + everything else on demand, with a
+# guest license supplied automatically — so NO custom Docker image and NO license
+# secret are required. The Android SDK/NDK/JDK and debug keystore are all
+# provisioned INSIDE the GitHub runner below (nothing is installed on any
+# developer machine).
+#
 # What it does:
-#   1. Builds a debug-signed armv8 (arm64) Android APK using the GameMaker CLI (igor).
-#   2. Builds the HTML5 (web) export and zips it.
+#   1. Builds a debug-signed armv8 (arm64) Android APK.
+#   2. Builds a browser (web) export and zips it.
 #   3. Publishes the web build to GitHub Pages.
-#   4. Creates a GitHub Release tagged like "v2026.1108" (or from an existing tag)
-#      and uploads BOTH the armv8 APK and the web ZIP to that same release.
-#
-# Requirements (see README.md "CI setup"):
-#   - A GameMaker installation with the command-line build tool on the runner,
-#     OR a Docker image that ships `igor` (the GameMaker CLI).
-#   - A GitHub secret for the GameMaker entitlement/license if your image needs one:
-#     GMS_LICENSE  (optional, only if your runner/image requires it).
-#
-# The `igor` CLI (GameMaker 2024.2+ / LTS) build syntax used here:
-#   igor --yyp="<project>.yyp" --target=<Target> --config="<config>" run
-#
-# NOTE: GameMaker "debug" Android configs are signed with the IDE's bundled
-# debug keystore automatically, which is exactly the "debug sign" this repo asks for.
+#   4. Creates a GitHub Release and uploads BOTH the armv8 APK and the web ZIP to
+#      that same release.
 
 on:
   push:
@@ -40,9 +36,13 @@ permissions:
   id-token: write      # OIDC for Pages deployment
 
 env:
+  GM_COMMAND: "@gamemaker/gm-cli@latest"
   PROJECT_YYP: neon-echo.yyp
   WEB_ZIP_NAME: neon-echo-web.zip
   APK_NAME: NeonEcho-armv8-debug.apk
+  # Android debug keystore (matches the Android SDK's default debug keystore).
+  KEYSTORE_ALIAS: androiddebugkey
+  KEYSTORE_PASS: android
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -55,47 +55,126 @@ jobs:
   build-android:
     name: Build Android (armv8, debug-signed)
     runs-on: ubuntu-latest
-    # If you use a self-hosted runner with GameMaker + Android SDK already
-    # installed, drop the `container:` block and use it directly.
-    container:
-      # Swap this for your GameMaker CLI image (e.g. a self-built image that
-      # bundles `igor`, the Android SDK + NDK, and your license).
-      image: ghcr.io/your-org/gamemaker-ci:latest
-      options: --user root
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
     env:
-      # Pass the license if your image needs to activate at build time.
-      GMS_LICENSE: ${{ secrets.GMS_LICENSE }}
-      ANDROID_KEYSTORE: debug.keystore        # bundled debug keystore
-      ANDROID_KEYSTORE_PASS: android          # default debug keystore password
-      ANDROID_KEY_ALIAS: androiddebugkey      # default debug alias
-      ANDROID_KEY_PASS: android               # default debug key password
+      # Exact versions required by GameMaker (see YoYoGames/GameMaker-Bugs
+      # wiki "Android-GMS2" setup guide).
+      ANDROID_API: 36
+      ANDROID_BUILD_TOOLS: 37.0.0
+      ANDROID_NDK: 30.0.15729638
+      ANDROID_SDK_ROOT: /opt/android-sdk
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install Android SDK cmdline-tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK="$ANDROID_SDK_ROOT"
+          mkdir -p "$SDK/cmdline-tools"
+          # Pin the cmdline-tools version that understands API 36 / build-tools 37.
+          TOOLS_VERSION=13114758
+          wget -q "https://dl.google.com/android/repository/commandlinetools-linux-${TOOLS_VERSION}_latest.zip" -O /tmp/cmt.zip
+          unzip -q /tmp/cmt.zip -d "$SDK/cmdline-tools"
+          mv "$SDK/cmdline-tools/cmdline-tools" "$SDK/cmdline-tools/latest"
+          chmod +x "$SDK/cmdline-tools/latest/bin/sdkmanager" "$SDK/cmdline-tools/latest/bin/avdmanager"
+          echo "$SDK/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+
+      - name: Accept licenses & install SDK packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK="$ANDROID_SDK_ROOT"
+          export ANDROID_HOME="$SDK"
+          export ANDROID_SDK_ROOT="$SDK"
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager \
+            "platforms;android-$ANDROID_API" \
+            "build-tools;$ANDROID_BUILD_TOOLS" \
+            "platform-tools" \
+            "ndk;$ANDROID_NDK"
+
+      - name: Cache gm-cli (Igor + runtime + project build)
+        uses: actions/cache@v4
+        with:
+          path: .gmcache
+          key: ${{ runner.os }}-gmcache-android-${{ hashFiles('neon-echo.yyp') }}
+
+      - name: Install FFmpeg (required for Linux builds)
+        id: cache-ffmpeg
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/ffmpeg-bin
+          key: ${{ runner.os }}-ffmpeg-6.0.1
+
+      - name: Install FFmpeg if not cached
+        if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
+        run: |
+          VERSION=6.0.1
+          RELEASE_NAME=ffmpeg-${VERSION}-amd64-static
+          mkdir -p ~/.local/share/ffmpeg-bin
+          wget -q --timeout=8 --tries=10 https://www.johnvansickle.com/ffmpeg/old-releases/${RELEASE_NAME}.tar.xz
+          tar -xf ${RELEASE_NAME}.tar.xz
+          mv ${RELEASE_NAME}/ffmpeg ${RELEASE_NAME}/ffprobe ~/.local/share/ffmpeg-bin/
+          rm -rf ${RELEASE_NAME} ${RELEASE_NAME}.tar.xz
+      - run: echo "$HOME/.local/share/ffmpeg-bin" >> $GITHUB_PATH
+
+      - name: Generate debug keystore
+        shell: bash
+        run: |
+          set -euo pipefail
+          keytool -genkeypair -v \
+            -keystore "$RUNNER_TEMP/debug.keystore" \
+            -storepass "${{ env.KEYSTORE_PASS }}" \
+            -keypass "${{ env.KEYSTORE_PASS }}" \
+            -alias "${{ env.KEYSTORE_ALIAS }}" \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+          echo "KEYSTORE_FILE=$RUNNER_TEMP/debug.keystore" >> "$GITHUB_ENV"
+
+      - name: Write gm-options.json (Android SDK + keystore)
+        shell: bash
+        run: |
+          cat > gm-options.json <<EOF
+          {
+            "toolchain": "GMS2",
+            "gms2": {
+              "android": {
+                "packageType": "apk",
+                "sdkPath": "$ANDROID_SDK_ROOT",
+                "ndkPath": "$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK",
+                "jdkPath": "$JAVA_HOME",
+                "keystoreFile": "$KEYSTORE_FILE",
+                "keystoreAlias": "${{ env.KEYSTORE_ALIAS }}",
+                "keystorePassword": "${{ env.KEYSTORE_PASS }}",
+                "keystoreAliasPassword": "${{ env.KEYSTORE_PASS }}"
+              }
+            }
+          }
+          EOF
 
       - name: Build armv8 debug APK
         shell: bash
         run: |
           set -euo pipefail
-          igor \
-            --yyp="${{ github.workspace }}/${{ env.PROJECT_YYP }}" \
-            --target="android" \
-            --config="armv8|debug" \
-            run
-          # Locate the produced APK; GameMaker writes under the project's
-          # "android" or a build-output directory depending on version.
-          APK_DIR="$(find . -type d -name 'default' -path '*android*' | head -n 1 || true)"
-          if [ -z "$APK_DIR" ]; then APK_DIR="android/armv8"; fi
-          APK="$(find "$APK_DIR" -name '*.apk' | head -n 1)"
-          if [ -z "$APK" ]; then
-            echo "Could not locate APK. Listing build dirs:"; find . -name '*.apk'
-            exit 1
-          fi
-          cp "$APK" "${{ env.APK_NAME }}"
-          echo "APK=$(pwd)/${{ env.APK_NAME }}" >> "$GITHUB_ENV"
+          # arm64 (armv8) architecture is selected in options/android/options_android.yy
+          # (option_android_arch_arm64: true), so the APK is arm64-only.
+          npx "$GM_COMMAND" package \
+            --target android \
+            --output "${{ env.APK_NAME }}" \
+            "${{ env.PROJECT_YYP }}"
+          ls -la "${{ env.APK_NAME }}"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -105,37 +184,69 @@ jobs:
           if-no-files-found: error
 
   # ---------------------------------------------------------------------------
-  # 2. Web — HTML5 export (zipped)
+  # 2. Web — browser export (zipped)
   # ---------------------------------------------------------------------------
   build-web:
-    name: Build Web (HTML5)
+    name: Build Web (browser / OperaGX)
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/your-org/gamemaker-ci:latest
-      options: --user root
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    env:
-      GMS_LICENSE: ${{ secrets.GMS_LICENSE }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build HTML5
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cache gm-cli
+        uses: actions/cache@v4
+        with:
+          path: .gmcache
+          key: ${{ runner.os }}-gmcache-web-${{ hashFiles('neon-echo.yyp') }}
+
+      - name: Install FFmpeg
+        id: cache-ffmpeg
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/ffmpeg-bin
+          key: ${{ runner.os }}-ffmpeg-6.0.1
+
+      - name: Install FFmpeg if not cached
+        if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
+        run: |
+          VERSION=6.0.1
+          RELEASE_NAME=ffmpeg-${VERSION}-amd64-static
+          mkdir -p ~/.local/share/ffmpeg-bin
+          wget -q --timeout=8 --tries=10 https://www.johnvansickle.com/ffmpeg/old-releases/${RELEASE_NAME}.tar.xz
+          tar -xf ${RELEASE_NAME}.tar.xz
+          mv ${RELEASE_NAME}/ffmpeg ${RELEASE_NAME}/ffprobe ~/.local/share/ffmpeg-bin/
+          rm -rf ${RELEASE_NAME} ${RELEASE_NAME}.tar.xz
+      - run: echo "$HOME/.local/share/ffmpeg-bin" >> $GITHUB_PATH
+
+      - name: Build web bundle (OperaGX / HTML5-WASM)
         shell: bash
         run: |
           set -euo pipefail
-          igor \
-            --yyp="${{ github.workspace }}/${{ env.PROJECT_YYP }}" \
-            --target="HTML5" \
-            --config="default" \
-            run
-          # HTML5 output: index.html + html5game/ directory (default GameMaker naming)
-          HTML_DIR="$(find "${{ github.workspace }}" -type f -name index.html -not -path '*/.git/*' | head -n1 | xargs dirname)"
-          echo "HTML_DIR=$HTML_DIR" >> "$GITHUB_ENV"
-          cd "$HTML_DIR"
-          zip -r "${{ github.workspace }}/${{ env.WEB_ZIP_NAME }}" .
+          # NOTE: The open-source GameMaker CLI currently packages these targets:
+          #   mac, windows, linux, operagx, android
+          # The legacy `html5` target is not wired into `package` yet ("coming
+          # soon"), so the browser build below uses `operagx` (GX.games), which is
+          # the HTML5/WebAssembly web export. Its zip contains the served game
+          # (index.html + game files) for static hosting.
+          npx "$GM_COMMAND" package \
+            --target operagx \
+            --output "${{ env.WEB_ZIP_NAME }}" \
+            "${{ env.PROJECT_YYP }}"
+          # Unpack for GitHub Pages; locate the served root (the folder with index.html).
+          mkdir -p site
+          unzip -o "${{ env.WEB_ZIP_NAME }}" -d site > /dev/null
+          INDEX="$(find site -name index.html -print -quit)"
+          if [ -n "$INDEX" ]; then
+            echo "WEB_DIR=$(dirname "$INDEX")" >> "$GITHUB_ENV"
+          else
+            echo "WEB_DIR=$(pwd)/site" >> "$GITHUB_ENV"
+            echo "::warning::No index.html found in web bundle; serving unpacked tree as-is."
+          fi
 
       - name: Upload web ZIP artifact
         uses: actions/upload-artifact@v4
@@ -147,7 +258,7 @@ jobs:
       - name: Upload Pages artifact (expanded site)
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.HTML_DIR }}
+          path: ${{ env.WEB_DIR }}
 
   # ---------------------------------------------------------------------------
   # 3. GitHub Pages deploy
@@ -171,10 +282,8 @@ jobs:
     name: Publish release (APK + web ZIP)
     needs: [build-android, build-web]
     runs-on: ubuntu-latest
-    # Only create a release on version tags, or explicitly via workflow_dispatch.
+    # Only create a release on version tags or explicit dispatch.
     if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
-    outputs:
-      upload_url: ${{ steps.release.outputs.upload_url }}
     steps:
       - name: Download APK
         uses: actions/download-artifact@v4

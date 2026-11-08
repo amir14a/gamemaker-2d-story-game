@@ -86,47 +86,58 @@ sprites/                       # empty placeholder sprites (art is procedural)
 
 ### Exports
 
-- **Android**: set the target to `Android`, config `armv8 | debug` for a
-  debug-signed APK (the workflow does exactly this).
-- **HTML5**: set target to `HTML5`; the game uses only the built-in font and
-  procedural art, so it needs no bundled assets.
+- **Android**: target `Android`, arm64 (armv8) architecture — see
+  `options/android/options_android.yy`. CI produces a debug-signed APK.
+- **Web**: the game is pure vector art + the built-in font, so it needs no
+  bundled assets.
 
 ---
 
 ## CI / CD (`.github/workflows/build.yml`)
 
-The workflow, on **push to `main`**, on **`v*` tags**, or on **manual dispatch**:
+The workflow uses the **official open-source GameMaker CLI — `@gamemaker/gm-cli`
+(Apache-2.0, by YoYoGames/Opera)** directly on stock `ubuntu-latest` runners.
+**No Docker image and no license secret are required** — `gm-cli` downloads Igor
++ the GameMaker runtime on demand and supplies a guest license automatically.
+The Android SDK/NDK/JDK and the debug keystore are all provisioned **inside the
+GitHub runner**, so nothing needs to be installed on any developer machine.
 
-1. **Build Android** — `igor --target="android" --config="armv8|debug"` → a
-   debug-signed **armv8 (arm64) APK** (GameMaker signs debug builds with the
-   bundled debug keystore automatically).
-2. **Build Web** — `igor --target="HTML5"` → zips the `index.html` + `html5game/`
-   output into `neon-echo-web.zip`.
-3. **Deploy GitHub Pages** — the expanded web build is deployed to the repo's
-   Pages site.
+It runs on **push to `main`**, on **`v*` tags**, or on **manual dispatch**:
+
+1. **Build Android** — `gm-cli package --target android --output NeonEcho-armv8-debug.apk`
+   → a debug-signed **armv8 (arm64) APK** (a debug keystore generated on the runner,
+   plus the SDK/NDK/JDK versions GameMaker requires: API 36, Build-Tools 37.0.0,
+   NDK 30.0.15729638, JDK 17).
+2. **Build Web** — `gm-cli package --target operagx --output neon-echo-web.zip`
+   → the browser (HTML5/WebAssembly) build, zipped and unpacked for Pages.
+3. **Deploy GitHub Pages** — the web build is deployed to the repo's Pages site.
 4. **Release** — a GitHub Release is created (name from tag or computed date) and
    **both** the armv8 APK and the web ZIP are attached to the *same* release.
 
+> **Note — web target:** the open-source CLI currently packages
+> `mac, windows, linux, operagx, android`. The legacy `html5` target isn't wired
+> into `gm-cli package` yet ("coming soon"), so the browser build uses
+> `operagx` (GX.games), which is the HTML5/WebAssembly web export and is served
+> from GitHub Pages. When `html5` lands in `gm-cli`, change `--target operagx`
+> back to `--target html5`.
+
 ### Required setup
 
-The workflow runs `igor` (the GameMaker CLI) inside a container image. You must
-either:
+None beyond the defaults — but enable **GitHub Pages** (Settings → Pages →
+source **"GitHub Actions"**) and ensure the repo's workflow permission is
+**Read & write** (the workflow also requests `contents: write` and `pages: write`
+itself). No repository secrets are needed (guest license).
 
-- point the two `container:` blocks at a **GameMaker CI image** that ships `igor`,
-  the Android SDK/NDK, and (optionally) a license — e.g. swap
-  `ghcr.io/your-org/gamemaker-ci:latest` for your own image; **or**
-- run the jobs on a **self-hosted runner** that already has GameMaker + Android
-  SDK installed (then delete the `container:` blocks).
+### What is pinned where
 
-Add a **repository secret** if your image needs license activation:
-
-```
-GMS_LICENSE = <your GameMaker entitlement / license>
-```
-
-Enable **GitHub Pages** (Settings → Pages → source "GitHub Actions") and make sure
-the repo has the default **Read & write** workflow permission (the workflow also
-requests `contents: write` and `pages: write`).
+| Item | Pinned value |
+| --- | --- |
+| GameMaker CLI | `@gamemaker/gm-cli@latest` (top of the workflow's `env`) |
+| Android API | `36` (`ANDROID_API` in the workflow) |
+| Android Build-Tools | `37.0.0` |
+| Android NDK | `30.0.15729638` |
+| JDK | Temurin 17 (`actions/setup-java`) |
+| arm64 arch | `option_android_arch_arm64: true` in `options/android/options_android.yy` |
 
 ---
 
