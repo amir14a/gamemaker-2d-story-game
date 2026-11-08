@@ -55,6 +55,7 @@ jobs:
   build-android:
     name: Build Android (armv8, debug-signed)
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     env:
       # Exact versions required by GameMaker (see YoYoGames/GameMaker-Bugs
       # wiki "Android-GMS2" setup guide).
@@ -68,7 +69,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -174,6 +175,7 @@ jobs:
   build-web:
     name: Build Web (browser / OperaGX)
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -181,7 +183,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Cache gm-cli
         uses: actions/cache@v4
