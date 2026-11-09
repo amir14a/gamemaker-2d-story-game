@@ -35,8 +35,8 @@ function build_parallax(_stratum, _tick) {
     var layers = [];
     var np = 3;                                    // number of parallax depth layers
     for (var L = 0; L < np; L++) {
-        var depth = (L + 1) / np;                  // 1 = far, small; np = near
-        var col_l = col_lerp(COL_BG, COL_CYAN, 0.25 + 0.25 * depth);
+        var d = (L + 1) / np;                  // 1 = far, small; np = near
+        var col_l = col_lerp(COL_BG, COL_CYAN, 0.25 + 0.25 * d);
         var w = [];
         var yy = 0;
         var h = 0;
@@ -44,39 +44,39 @@ function build_parallax(_stratum, _tick) {
         switch (_stratum) {
             case STRATUM_LOOP:
                 h = 70 + L * 40;
-                col_l = col_lerp(COL_CYAN, COL_BLUE, depth);
+                col_l = col_lerp(COL_CYAN, COL_BLUE, d);
                 break;
             case STRATUM_FOUNDRY:
                 h = 90 + L * 46;
-                col_l = col_lerp(COL_ORANGE, COL_RED, depth);
+                col_l = col_lerp(COL_ORANGE, COL_RED, d);
                 break;
             case STRATUM_APEX:
                 h = 200 + L * 30;
-                col_l = col_lerp(COL_VIOLET, COL_CYAN, depth);
+                col_l = col_lerp(COL_VIOLET, COL_CYAN, d);
                 break;
             case STRATUM_FLOOD:
                 h = 40 + L * 34;
-                col_l = col_lerp(COL_BLUE, COL_GREEN, depth);
+                col_l = col_lerp(COL_BLUE, COL_GREEN, d);
                 break;
             default: // SINK
                 h = 120 + L * 30;
-                col_l = col_lerp(COL_MAGENTA, COL_CYAN, depth);
+                col_l = col_lerp(COL_MAGENTA, COL_CYAN, d);
                 break;
         }
         step = 60 + L * 40;
         // building silhouettes, deterministically varied
-        for (var x = -200; x < 3200; x += step) {
-            var r = h32(9001 + L, x, 0);
+        for (var xx = -200; xx < 3200; xx += step) {
+            var r = h32(9001 + L, xx, 0);
             var bh = h * (0.4 + r * 0.9 + L * 0.15);
             var bw = step * (0.5 + r * 0.5);
-            w[array_length(w)] = { x: x, w: bw, h: bh };
+            w[array_length(w)] = { x: xx, w: bw, h: bh };
         }
         layers[array_length(layers)] = {
-            depth: depth,
+            depth: d,
             y0: 0,
             col: col_l,
             buildings: w,
-            speed: 0.1 + depth * 0.35,
+            speed: 0.1 + d * 0.35,
         };
     }
     return layers;

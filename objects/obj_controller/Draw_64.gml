@@ -133,7 +133,7 @@ if (global.story.subtitle != null && !global.story.active) {
     var sy = global.vpH - sh - 54;
     draw_set_alpha(sa);
     draw_round_rect_glow(global.vpW * 0.1, sy, global.vpW * 0.9, sy + sh, 8,
-        make_colour_rgb(8,10,24,0), COL_CYAN, 0.4 * sa);
+        make_colour_rgb(8,10,24), COL_CYAN, 0.4 * sa);
     draw_set_halign(fa_center);
     draw_set_valign(fa_top);
     var wx = global.vpW / 2;

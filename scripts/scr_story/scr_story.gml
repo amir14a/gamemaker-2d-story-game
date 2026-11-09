@@ -27,10 +27,10 @@ function story_config() {
 }
 
 // Convert a compact beat shorthand into full struct list.
-function beats(..._list) {
+function beats() {
     var out = [];
-    for (var i = 0; i < array_length(_list); i++) {
-        var b = _list[i];
+    for (var i = 0; i < argument_count; i++) {
+        var b = argument[i];
         if (is_string(b)) b = { type: "subtitle", who: "James", text: b, dur: 3, size: 1 };
         if (b.type == "comm"    && !variable_struct_exists(b, "who"))  b.who = "James";
         if (b.type == "meeting" && !variable_struct_exists(b, "who"))  b.who = "Books";

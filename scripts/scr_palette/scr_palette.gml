@@ -1,19 +1,19 @@
 // scr_palette.gml — global colour constants for the NEON ECHO cyberpunk look.
 
-#macro COL_BG          $090b18   // deep near-black blue
-#macro COL_BG2         $0c1030   // secondary deep
-#macro COL_CYAN        $29e6ff   // primary neon cyan
-#macro COL_MAGENTA      $ff2e88   // Millie's warm magenta / flashback wash
-#macro COL_PINK         $ff5cd0
-#macro COL_BLUE         $3d7bff
-#macro COL_GREEN        $46ffb0
-#macro COL_GOLD         $ffd166
-#macro COL_RED          $ff3b4d
-#macro COL_WHITE        $eef4ff
-#macro COL_GREY         $8b93a7
-#macro COL_DARKGREY     $2a3350
-#macro COL_ORANGE       $ff8c42
-#macro COL_VIOLET       $9d6bff
+#macro COL_BG          1575689   // deep near-black blue
+#macro COL_BG2         3149836   // secondary deep
+#macro COL_CYAN        16770601   // primary neon cyan
+#macro COL_MAGENTA      8924927   // Millie's warm magenta / flashback wash
+#macro COL_PINK         13655295
+#macro COL_BLUE         16743229
+#macro COL_GREEN        11599686
+#macro COL_GOLD         6738431
+#macro COL_RED          5061631
+#macro COL_WHITE        16774382
+#macro COL_GREY         10982283
+#macro COL_DARKGREY     5255978
+#macro COL_ORANGE       4361471
+#macro COL_VIOLET       16739229
 
 // Speaker colours for the comm system.
 global.speaker_colours = ds_map_create();

@@ -12,7 +12,7 @@ function save_game() {
         episode: global.story.episode,
     };
     var s = json_stringify(data);
-    if (os_browser == browser_not_a_browser && !os_is_html5()) {
+    if (os_browser == browser_not_a_browser) {
         // desktop / Android file write
         var dir = working_directory;
         var f = file_text_open_write(dir + save_slot());
@@ -31,7 +31,7 @@ function load_game() {
     var s = null;
     var ok = false;
     // file_exists check
-    if (!os_is_html5()) {
+    if (os_browser == browser_not_a_browser) {
         if (file_exists(working_directory + save_slot())) {
             var f = file_text_open_read(working_directory + save_slot());
             s = file_text_read_string(f);

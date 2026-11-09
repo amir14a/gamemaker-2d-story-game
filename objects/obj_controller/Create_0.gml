@@ -11,7 +11,7 @@ global.vpH = 540;
 global.tick = 0;
 
 // input / touch
-global.touch_enabled = os_is_html5() ? false : (os_type == os_android || os_type == os_ios);
+global.touch_enabled = (os_browser != browser_not_a_browser) ? false : (os_type == os_android || os_type == os_ios);
 global.vbtn_held = array_create(8, false);
 global.vbtn_pressed = array_create(8, false);
 global.vbtn_released = array_create(8, false);

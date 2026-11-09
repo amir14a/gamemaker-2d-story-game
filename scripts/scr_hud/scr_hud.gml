@@ -124,14 +124,14 @@ function draw_credits() {
     var scroll = clamp((global.credits_timer / 2) - global.vpH, -global.vpH, 0);
     draw_set_halign(fa_center);
     draw_set_valign(fa_top);
-    var y = global.vpH + scroll;
+    var yy = global.vpH + scroll;
     for (var i = 0; i < n; i++) {
         var isHead = (i == 0);
         draw_set_color(isHead ? COL_CYAN : (string_pos("— Mara", lines[i]) ? COL_PINK : COL_WHITE));
         draw_set_font(isHead ? FONT_TITLE : -1);
-        draw_text(global.vpW / 2, y, lines[i]);
+        draw_text(global.vpW / 2, yy, lines[i]);
         draw_set_font(-1);
-        y += 26;
+        yy += 26;
     }
     // hint
     draw_set_colour(COL_GREY);
