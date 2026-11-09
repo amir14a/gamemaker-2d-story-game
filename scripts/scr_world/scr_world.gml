@@ -71,15 +71,19 @@ function build_parallax(_stratum, _tick) {
             var r = h32(9001 + L, xx, 0);
             var bh = h * (0.4 + r * 0.9 + L * 0.15);
             var bw = step * (0.5 + r * 0.5);
-            w[array_length(w)] = { x: xx, w: bw, h: bh };
+            var bld = {};
+            bld.x = xx;
+            bld.w = bw;
+            bld.h = bh;
+            w[array_length(w)] = bld;
         }
-        layers[array_length(layers)] = {
-            depth: d,
-            y0: 0,
-            col: col_l,
-            buildings: w,
-            speed: 0.1 + d * 0.35,
-        };
+        var lay = {};
+        lay.depth = d;
+        lay.y0 = 0;
+        lay.col = col_l;
+        lay.buildings = w;
+        lay.speed = 0.1 + d * 0.35;
+        layers[array_length(layers)] = lay;
     }
     return layers;
 }
@@ -98,12 +102,12 @@ function build_motes(_stratum, _count) {
         case STRATUM_APEX:    name = "stars";  col = COL_WHITE;   spd = 0.3; break;
     }
     for (var i = 0; i < _count; i++) {
-        arr[array_length(arr)] = {
-            x: global.vpW * h32(777, i, 0),
-            y: global.vpH * h32(777, i, 1),
-            spd: spd * (0.5 + h32(777, i, 2)),
-            col: col
-        };
+        var m = {};
+        m.x = global.vpW * h32(777, i, 0);
+        m.y = global.vpH * h32(777, i, 1);
+        m.spd = spd * (0.5 + h32(777, i, 2));
+        m.col = col;
+        arr[array_length(arr)] = m;
     }
     return arr;
 }

@@ -23,7 +23,6 @@ global.story.scene_index = 0;
 global.story.scene = story_scene_sequence()[0];
 global.story.beats = story_beats_for(global.story.scene);
 global.story.beat = 0;
-global.story.queue = ds_queue_create();
 global.story.active = false;
 global.story.dialogue = null;       // currently displaying comm/meeting struct
 global.story.type_chars = 0;
@@ -86,6 +85,7 @@ function story_prime_next() {
 }
 
 function fire_beat(_b) {
+    if (_b == null) return;
     switch (_b.type) {
         case "title":
             global.story.title_text = _b.text;

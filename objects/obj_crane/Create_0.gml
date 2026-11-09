@@ -12,7 +12,13 @@ function crane_collect() {
         global.cam_shake = 3;
         global.cranes_collected = global.cranes_collected + 1;
         with (obj_controller) {
-            global.story.subtitle = { type: "subtitle", who: "", text: "A paper crane. The next breadcrumb.", dur: 2, size: 1 };
+            var st = {};
+            st.type = "subtitle";
+            st.who = "";
+            st.text = "A paper crane. The next breadcrumb.";
+            st.dur = 2;
+            st.size = 1;
+            global.story.subtitle = st;
             global.story.subtitle_timer = 120;
         }
         instance_destroy(self);

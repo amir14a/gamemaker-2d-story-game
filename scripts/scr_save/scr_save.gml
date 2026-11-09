@@ -6,11 +6,10 @@ function save_slot() {
 }
 
 function save_game() {
-    var data = {
-        scene: global.story.scene,
-        scene_index: global.story.scene_index,
-        episode: global.story.episode,
-    };
+    var data = {};
+    data.scene = global.story.scene;
+    data.scene_index = global.story.scene_index;
+    data.episode = global.story.episode;
     var s = json_stringify(data);
     if (os_browser == browser_not_a_browser) {
         // desktop / Android file write
