@@ -123,16 +123,20 @@ It runs on **push to `main`**, on **`v*` tags**, or on **manual dispatch**:
 
 ### Required setup
 
-None beyond the defaults — but enable **GitHub Pages** (Settings → Pages →
-source **"GitHub Actions"**) and ensure the repo's workflow permission is
-**Read & write** (the workflow also requests `contents: write` and `pages: write`
-itself). No repository secrets are needed (guest license).
+- **GitHub Pages** — enable it (Settings → Pages → source **"GitHub Actions"**).
+- **Workflow permission** — ensure the repo's workflow permission is **Read & write**
+  (the workflow also requests `contents: write` and `pages: write` itself).
+- **`GAMEMAKER_PAT` secret (Android only)** — the **web** build works with the
+  free guest license, but **Android export is a paid GameMaker target**. Add your
+  access key from <https://gamemaker.io/en/account/access-keys> as a repository
+  secret named **`GAMEMAKER_PAT`**, or the Android job fails with
+  `Permission Error : Unable to obtain permission to execute`.
 
 ### What is pinned where
 
 | Item | Pinned value |
 | --- | --- |
-| GameMaker CLI | `@gamemaker/gm-cli@latest` (top of the workflow's `env`) |
+| GameMaker CLI | `@gamemaker/gm-cli@2.4.1` (top of the workflow's `env`) |
 | Android API | `36` (`ANDROID_API` in the workflow) |
 | Android Build-Tools | `37.0.0` |
 | Android NDK | `30.0.15729638` |

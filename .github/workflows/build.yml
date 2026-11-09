@@ -74,6 +74,28 @@ jobs:
       - name: Install GameMaker CLI (pinned)
         run: npm install -g "$GM_COMMAND"
 
+      # Android export is a PAID GameMaker target: the guest license that
+      # gm-cli auto-provisions only covers free targets (OperaGX/GX.games,
+      # desktop test). To build the APK you must add a GameMaker access key
+      # (https://gamemaker.io/en/account/access-keys) as a repo secret named
+      # GAMEMAKER_PAT. Without it the asset compiler fails with:
+      #   "Permission Error : Unable to obtain permission to execute".
+      - name: Verify Android license secret
+        run: |
+          if [ -z "${GAMEMAKER_PAT:-}" ]; then
+            echo "::error::Repository secret 'GAMEMAKER_PAT' is missing."
+            echo "::error::Android export is a paid GameMaker target and requires a license."
+            echo "::error::Add your access key (https://gamemaker.io/en/account/access-keys) as a secret named GAMEMAKER_PAT, then re-run."
+            exit 1
+          fi
+        env:
+          GAMEMAKER_PAT: ${{ secrets.GAMEMAKER_PAT }}
+
+      - name: Sign in to GameMaker (Android license)
+        run: gm-cli login "$GAMEMAKER_PAT"
+        env:
+          GAMEMAKER_PAT: ${{ secrets.GAMEMAKER_PAT }}
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
