@@ -9,10 +9,12 @@
 
 // Deterministic hash so the world is stable across frames / sessions.
 function h32(_seed, _x, _y) {
-    var n = _seed * 374761393 + _x * 668265263 + _y * 2147483647;
-    n = (n ^ (n >> 13)) * 1274126177;
-    n = (n ^ (n >> 16));
-    return (n & 0x7fffffff) / 2147483647.0;
+    // Safe deterministic hash: avoids bitwise ops on large doubles, which can
+    // overflow int64 and trap the WASM runtime ("memory access out of bounds").
+    var n = abs(_seed) * 374761393 + abs(_x) * 668265263 + abs(_y) * 2147483647;
+    n = n mod 10000019;
+    n = (n * 48271 + 12345) mod 10000019;
+    return n / 10000019.0;
 }
 
 function stratum_for_scene(_scene) {
