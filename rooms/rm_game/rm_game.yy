@@ -11,6 +11,7 @@
    "path": "rooms/rm_game/rm_game.yy"
   }
  ],
+ "isDnd": false,
  "layers": [
   {
    "$GMRInstanceLayer": "",
@@ -38,6 +39,7 @@
      "inheritCode": false,
      "inheritedItemId": null,
      "inheritItemSettings": false,
+     "isDnd": false,
      "name": "inst_00000001",
      "objectId": {
       "name": "obj_controller",
@@ -50,8 +52,7 @@
      "scaleX": 1.0,
      "scaleY": 1.0,
      "x": 0.0,
-     "y": 0.0,
-     "isDnd": false
+     "y": 0.0
     }
    ],
    "layers": [],
@@ -73,8 +74,8 @@
   "inheritPhysicsSettings": false,
   "PhysicsWorld": false,
   "PhysicsWorldGravityX": 0.0,
-  "PhysicsWorldGravityY": 0.0,
-  "PhysicsWorldPixToMetres": 0.0
+  "PhysicsWorldGravityY": 10.0,
+  "PhysicsWorldPixToMetres": 0.1
  },
  "resourceType": "GMRoom",
  "resourceVersion": "2.0",
@@ -87,30 +88,13 @@
  "sequenceId": null,
  "views": [
   {
-   "hborder": 0,
+   "hborder": 32,
    "hport": 540,
    "hspeed": -1,
    "hview": 540,
    "inherit": false,
    "objectId": null,
-   "vborder": 0,
-   "visible": true,
-   "vspeed": -1,
-   "wport": 960,
-   "wview": 960,
-   "xport": 0,
-   "xview": 0,
-   "yport": 0,
-   "yview": 0
-  },
-  {
-   "hborder": 0,
-   "hport": 540,
-   "hspeed": -1,
-   "hview": 540,
-   "inherit": false,
-   "objectId": null,
-   "vborder": 0,
+   "vborder": 32,
    "visible": false,
    "vspeed": -1,
    "wport": 960,
@@ -121,13 +105,13 @@
    "yview": 0
   },
   {
-   "hborder": 0,
+   "hborder": 32,
    "hport": 540,
    "hspeed": -1,
    "hview": 540,
    "inherit": false,
    "objectId": null,
-   "vborder": 0,
+   "vborder": 32,
    "visible": false,
    "vspeed": -1,
    "wport": 960,
@@ -138,13 +122,13 @@
    "yview": 0
   },
   {
-   "hborder": 0,
+   "hborder": 32,
    "hport": 540,
    "hspeed": -1,
    "hview": 540,
    "inherit": false,
    "objectId": null,
-   "vborder": 0,
+   "vborder": 32,
    "visible": false,
    "vspeed": -1,
    "wport": 960,
@@ -155,13 +139,13 @@
    "yview": 0
   },
   {
-   "hborder": 0,
+   "hborder": 32,
    "hport": 540,
    "hspeed": -1,
    "hview": 540,
    "inherit": false,
    "objectId": null,
-   "vborder": 0,
+   "vborder": 32,
    "visible": false,
    "vspeed": -1,
    "wport": 960,
@@ -172,13 +156,13 @@
    "yview": 0
   },
   {
-   "hborder": 0,
+   "hborder": 32,
    "hport": 540,
    "hspeed": -1,
    "hview": 540,
    "inherit": false,
    "objectId": null,
-   "vborder": 0,
+   "vborder": 32,
    "visible": false,
    "vspeed": -1,
    "wport": 960,
@@ -189,13 +173,13 @@
    "yview": 0
   },
   {
-   "hborder": 0,
+   "hborder": 32,
    "hport": 540,
    "hspeed": -1,
    "hview": 540,
    "inherit": false,
    "objectId": null,
-   "vborder": 0,
+   "vborder": 32,
    "visible": false,
    "vspeed": -1,
    "wport": 960,
@@ -206,13 +190,30 @@
    "yview": 0
   },
   {
-   "hborder": 0,
+   "hborder": 32,
    "hport": 540,
    "hspeed": -1,
    "hview": 540,
    "inherit": false,
    "objectId": null,
-   "vborder": 0,
+   "vborder": 32,
+   "visible": false,
+   "vspeed": -1,
+   "wport": 960,
+   "wview": 960,
+   "xport": 0,
+   "xview": 0,
+   "yport": 0,
+   "yview": 0
+  },
+  {
+   "hborder": 32,
+   "hport": 540,
+   "hspeed": -1,
+   "hview": 540,
+   "inherit": false,
+   "objectId": null,
+   "vborder": 32,
    "visible": false,
    "vspeed": -1,
    "wport": 960,
