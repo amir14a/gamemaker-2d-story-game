@@ -53,9 +53,9 @@ if (btn_pressed(BTN_PAUSE)) {
 }
 
 // --- subtitle timer ---
-if (global.story.subtitle != null) {
+if (global.story.subtitle != undefined) {
     global.story.subtitle_timer--;
-    if (global.story.subtitle_timer <= 0) global.story.subtitle = null;
+    if (global.story.subtitle_timer <= 0) global.story.subtitle = undefined;
 }
 
 // --- title timer ---
@@ -71,14 +71,14 @@ if (global.story.active) {
             global.story.type_chars = string_length(full);
         } else {
             global.story.active = false;
-            global.story.dialogue = null;
+            global.story.dialogue = undefined;
             alarm[0] = 20;
         }
     }
 }
 
 // --- non-blocking beat gate ---
-if (!global.story.active && global.story.dialogue == null && !global.story.credits) {
+if (!global.story.active && global.story.dialogue == undefined && !global.story.credits) {
     if (global.beat_delay_timer > 0) {
         global.beat_delay_timer--;
         if (global.beat_delay_timer <= 0) story_advance();

@@ -11,7 +11,7 @@
 //
 // IMPORTANT: beats are built with the B() helper (explicit property assignment)
 // rather than nested struct/array literals, because nested literals are
-// unreliable in the HTML5/WASM runner and produce null structs at runtime.
+// unreliable in the HTML5/WASM runner and produce undefined structs at runtime.
 
 function story_config() {
     var s = {};

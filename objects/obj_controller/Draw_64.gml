@@ -119,7 +119,7 @@ if (global.story.title_timer > 0) {
 }
 
 // ---- floating subtitle ----
-if (global.story.subtitle != null && !global.story.active) {
+if (global.story.subtitle != undefined && !global.story.active) {
     var st = global.story.subtitle;
     var sa = 1;
     if (global.story.subtitle_timer < 40) sa = global.story.subtitle_timer / 40;
@@ -145,7 +145,7 @@ if (global.story.subtitle != null && !global.story.active) {
 }
 
 // ---- comm / meeting dialogue card ----
-if (global.story.active && global.story.dialogue != null) {
+if (global.story.active && global.story.dialogue != undefined) {
     var d = global.story.dialogue;
     var sc = speaker_colour(d.who);
     // dim background

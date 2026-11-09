@@ -102,7 +102,7 @@ function menu_confirm() {
             global.story.beats = story_beats_for(global.story.scene);
             global.story.beat = 0;
             global.story.active = false;
-            global.story.dialogue = null;
+            global.story.dialogue = undefined;
             global.story.credits = false;
             scene_build(global.story.scene);
             global.game_state = "play";
@@ -116,7 +116,7 @@ function start_new() {
     global.story.beats = story_beats_for(global.story.scene);
     global.story.beat = 0;
     global.story.active = false;
-    global.story.dialogue = null;
+    global.story.dialogue = undefined;
     global.story.credits = false;
     global.health = 100;
     global.breath = 100;
@@ -128,7 +128,7 @@ function start_new() {
 
 function start_continue() {
     var d = load_game();
-    if (d != null && !is_undefined(d.scene_index) && d.scene_index > 0) {
+    if (d != undefined && !is_undefined(d.scene_index) && d.scene_index > 0) {
         global.story.scene_index = clamp(d.scene_index, 0, array_length(story_scene_sequence()) - 1);
         global.story.scene = story_scene_sequence()[global.story.scene_index];
     } else {
@@ -138,7 +138,7 @@ function start_continue() {
     global.story.beats = story_beats_for(global.story.scene);
     global.story.beat = 0;
     global.story.active = false;
-    global.story.dialogue = null;
+    global.story.dialogue = undefined;
     global.story.credits = false;
     global.health = 100;
     global.breath = 100;

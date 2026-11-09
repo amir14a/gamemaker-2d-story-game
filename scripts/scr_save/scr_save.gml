@@ -27,7 +27,7 @@ function save_game() {
 }
 
 function load_game() {
-    var s = null;
+    var s = undefined;
     var ok = false;
     // file_exists check
     if (os_browser == browser_not_a_browser) {
@@ -45,13 +45,13 @@ function load_game() {
             ok = true;
         }
     }
-    if (!ok || s == null || s == "") return null;
+    if (!ok || s == undefined || s == "") return undefined;
     return json_parse(s);
 }
 
 function load_state(_scene_index) {
     var d = load_game();
-    if (d == null || is_undefined(d.scene_index)) {
+    if (d == undefined || is_undefined(d.scene_index)) {
         // fresh start
         global.story.scene_index = 0;
         global.story.scene = story_scene_sequence()[0];

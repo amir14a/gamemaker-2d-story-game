@@ -24,9 +24,9 @@ global.story.scene = story_scene_sequence()[0];
 global.story.beats = story_beats_for(global.story.scene);
 global.story.beat = 0;
 global.story.active = false;
-global.story.dialogue = null;       // currently displaying comm/meeting struct
+global.story.dialogue = undefined;       // currently displaying comm/meeting struct
 global.story.type_chars = 0;
-global.story.subtitle = null;
+global.story.subtitle = undefined;
 global.story.subtitle_timer = 0;
 global.story.objective = "";
 global.story.title_timer = 0;
@@ -85,7 +85,7 @@ function story_prime_next() {
 }
 
 function fire_beat(_b) {
-    if (_b == null) return;
+    if (_b == undefined) return;
     switch (_b.type) {
         case "title":
             global.story.title_text = _b.text;
@@ -142,8 +142,8 @@ function story_next_scene() {
     global.story.scene = story_scene_sequence()[global.story.scene_index];
     global.story.beats = story_beats_for(global.story.scene);
     global.story.beat = 0;
-    global.story.dialogue = null;
-    global.story.subtitle = null;
+    global.story.dialogue = undefined;
+    global.story.subtitle = undefined;
     global.story.active = false;
     global.stratum = stratum_for_scene(global.story.scene);
     global.layers = build_parallax(global.stratum, global.tick);
