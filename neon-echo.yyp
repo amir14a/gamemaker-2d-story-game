@@ -1,14 +1,15 @@
 {
- "$GMProject": "",
+ "$GMProject": "v1",
  "%Name": "NEON ECHO",
  "AudioGroups": [
   {
-   "$GMAudioGroup": "",
+   "$GMAudioGroup": "v1",
    "%Name": "audiogroup_default",
    "name": "audiogroup_default",
    "resourceType": "GMAudioGroup",
    "resourceVersion": "2.0",
-   "targets": -1
+   "targets": -1,
+   "exportDir": ""
   }
  ],
  "configs": {
@@ -47,7 +48,7 @@
  "isEcma": false,
  "LibraryEmitters": [],
  "MetaData": {
-  "IDEVersion": "2024.11.0.179"
+  "IDEVersion": "2026.100.0.1118"
  },
  "name": "NEON ECHO",
  "resources": [
@@ -170,7 +171,7 @@
    }
   }
  ],
- "templateType": null,
+ "templateType": "game",
  "TextureGroups": [
   {
    "$GMTextureGroup": "",
