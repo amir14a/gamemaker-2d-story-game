@@ -1,1 +1,0 @@
-// obj_vehicle — DRAW unused; rendering via render().

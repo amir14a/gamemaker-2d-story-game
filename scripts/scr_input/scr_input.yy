@@ -1,10 +1,13 @@
 {
- "name": "scr_input",
- "isDnD": false,
+ "$GMScript": "v1",
+ "%Name": "scr_input",
  "isCompatibility": false,
- "parent": null,
- "resourceVersion": "1.0",
+ "isDnD": false,
+ "name": "scr_input",
+ "parent": {
+  "name": "Scripts",
+  "path": "folders/Scripts.yy"
+ },
  "resourceType": "GMScript",
- "order": 3,
- "tags": []
+ "resourceVersion": "2.0"
 }

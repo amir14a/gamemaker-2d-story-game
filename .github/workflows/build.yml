@@ -36,7 +36,7 @@ permissions:
   id-token: write      # OIDC for Pages deployment
 
 env:
-  GM_COMMAND: "@gamemaker/gm-cli@latest"
+  GM_COMMAND: "@gamemaker/gm-cli@2.4.1"
   PROJECT_YYP: neon-echo.yyp
   WEB_ZIP_NAME: neon-echo-web.zip
   APK_NAME: NeonEcho-armv8-debug.apk
@@ -70,6 +70,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
+
+      - name: Install GameMaker CLI (pinned)
+        run: npm install -g "$GM_COMMAND"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -156,7 +159,7 @@ jobs:
           set -euo pipefail
           # arm64 (armv8) architecture is selected in options/android/options_android.yy
           # (option_android_arch_arm64: true), so the APK is arm64-only.
-          npx "$GM_COMMAND" package \
+          gm-cli package \
             --target android \
             --output "${{ env.APK_NAME }}" \
             "${{ env.PROJECT_YYP }}"
@@ -184,6 +187,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
+
+      - name: Install GameMaker CLI (pinned)
+        run: npm install -g "$GM_COMMAND"
 
       - name: Cache gm-cli
         uses: actions/cache@v4
@@ -220,7 +226,7 @@ jobs:
           # soon"), so the browser build below uses `operagx` (GX.games), which is
           # the HTML5/WebAssembly web export. Its zip contains the served game
           # (index.html + game files) for static hosting.
-          npx "$GM_COMMAND" package \
+          gm-cli package \
             --target operagx \
             --output "${{ env.WEB_ZIP_NAME }}" \
             "${{ env.PROJECT_YYP }}"

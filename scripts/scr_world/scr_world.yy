@@ -1,10 +1,13 @@
 {
- "name": "scr_world",
- "isDnD": false,
+ "$GMScript": "v1",
+ "%Name": "scr_world",
  "isCompatibility": false,
- "parent": null,
- "resourceVersion": "1.0",
+ "isDnD": false,
+ "name": "scr_world",
+ "parent": {
+  "name": "Scripts",
+  "path": "folders/Scripts.yy"
+ },
  "resourceType": "GMScript",
- "order": 5,
- "tags": []
+ "resourceVersion": "2.0"
 }

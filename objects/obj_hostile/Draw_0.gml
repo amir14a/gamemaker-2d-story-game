@@ -1,1 +1,0 @@
-// obj_hostile — DRAW unused; rendering via render() called from the controller.

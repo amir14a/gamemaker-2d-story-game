@@ -1,10 +1,13 @@
 {
- "name": "scr_hud",
- "isDnD": false,
+ "$GMScript": "v1",
+ "%Name": "scr_hud",
  "isCompatibility": false,
- "parent": null,
- "resourceVersion": "1.0",
+ "isDnD": false,
+ "name": "scr_hud",
+ "parent": {
+  "name": "Scripts",
+  "path": "folders/Scripts.yy"
+ },
  "resourceType": "GMScript",
- "order": 8,
- "tags": []
+ "resourceVersion": "2.0"
 }

@@ -1,226 +1,193 @@
 {
+ "$GMProject": "",
+ "%Name": "NEON ECHO",
+ "AudioGroups": [
+  {
+   "$GMAudioGroup": "",
+   "%Name": "audiogroup_default",
+   "name": "audiogroup_default",
+   "resourceType": "GMAudioGroup",
+   "resourceVersion": "2.0",
+   "targets": -1
+  }
+ ],
+ "configs": {
+  "children": [],
+  "name": "Default"
+ },
+ "defaultScriptType": 1,
+ "Folders": [
+  {
+   "$GMFolder": "",
+   "%Name": "Objects",
+   "folderPath": "folders/Objects.yy",
+   "name": "Objects",
+   "resourceType": "GMFolder",
+   "resourceVersion": "2.0"
+  },
+  {
+   "$GMFolder": "",
+   "%Name": "Rooms",
+   "folderPath": "folders/Rooms.yy",
+   "name": "Rooms",
+   "resourceType": "GMFolder",
+   "resourceVersion": "2.0"
+  },
+  {
+   "$GMFolder": "",
+   "%Name": "Scripts",
+   "folderPath": "folders/Scripts.yy",
+   "name": "Scripts",
+   "resourceType": "GMFolder",
+   "resourceVersion": "2.0"
+  }
+ ],
+ "ForcedPrefabProjectReferences": [],
+ "IncludedFiles": [],
+ "isEcma": false,
+ "LibraryEmitters": [],
+ "MetaData": {
+  "IDEVersion": "2024.11.0.179"
+ },
+ "name": "NEON ECHO",
  "resources": [
-  {
-   "id": {
-    "name": "spr_player",
-    "path": "sprites/spr_player/spr_player.yy"
-   },
-   "order": 1,
-   "resourceType": "GMSprite",
-   "resourceVersion": "1.0"
-  },
-  {
-   "id": {
-    "name": "spr_hostile",
-    "path": "sprites/spr_hostile/spr_hostile.yy"
-   },
-   "order": 2,
-   "resourceType": "GMSprite",
-   "resourceVersion": "1.0"
-  },
-  {
-   "id": {
-    "name": "spr_crane",
-    "path": "sprites/spr_crane/spr_crane.yy"
-   },
-   "order": 3,
-   "resourceType": "GMSprite",
-   "resourceVersion": "1.0"
-  },
-  {
-   "id": {
-    "name": "spr_vehicle",
-    "path": "sprites/spr_vehicle/spr_vehicle.yy"
-   },
-   "order": 4,
-   "resourceType": "GMSprite",
-   "resourceVersion": "1.0"
-  },
   {
    "id": {
     "name": "obj_controller",
     "path": "objects/obj_controller/obj_controller.yy"
-   },
-   "order": 5,
-   "resourceType": "GMObject",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "obj_player",
     "path": "objects/obj_player/obj_player.yy"
-   },
-   "order": 6,
-   "resourceType": "GMObject",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "obj_hostile",
     "path": "objects/obj_hostile/obj_hostile.yy"
-   },
-   "order": 7,
-   "resourceType": "GMObject",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "obj_crane",
     "path": "objects/obj_crane/obj_crane.yy"
-   },
-   "order": 8,
-   "resourceType": "GMObject",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "obj_vehicle",
     "path": "objects/obj_vehicle/obj_vehicle.yy"
-   },
-   "order": 9,
-   "resourceType": "GMObject",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "obj_bullet",
     "path": "objects/obj_bullet/obj_bullet.yy"
-   },
-   "order": 10,
-   "resourceType": "GMObject",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "obj_trigger",
     "path": "objects/obj_trigger/obj_trigger.yy"
-   },
-   "order": 11,
-   "resourceType": "GMObject",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "rm_game",
     "path": "rooms/rm_game/rm_game.yy"
-   },
-   "order": 12,
-   "resourceType": "GMRoom",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "scr_palette",
     "path": "scripts/scr_palette/scr_palette.yy"
-   },
-   "order": 13,
-   "resourceType": "GMScript",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "scr_draw",
     "path": "scripts/scr_draw/scr_draw.yy"
-   },
-   "order": 14,
-   "resourceType": "GMScript",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "scr_input",
     "path": "scripts/scr_input/scr_input.yy"
-   },
-   "order": 15,
-   "resourceType": "GMScript",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "scr_story",
     "path": "scripts/scr_story/scr_story.yy"
-   },
-   "order": 16,
-   "resourceType": "GMScript",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "scr_world",
     "path": "scripts/scr_world/scr_world.yy"
-   },
-   "order": 17,
-   "resourceType": "GMScript",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "scr_save",
     "path": "scripts/scr_save/scr_save.yy"
-   },
-   "order": 18,
-   "resourceType": "GMScript",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "scr_text",
     "path": "scripts/scr_text/scr_text.yy"
-   },
-   "order": 19,
-   "resourceType": "GMScript",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "scr_hud",
     "path": "scripts/scr_hud/scr_hud.yy"
-   },
-   "order": 20,
-   "resourceType": "GMScript",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "scr_scene",
     "path": "scripts/scr_scene/scr_scene.yy"
-   },
-   "order": 21,
-   "resourceType": "GMScript",
-   "resourceVersion": "1.0"
+   }
   },
   {
    "id": {
     "name": "scr_menu",
     "path": "scripts/scr_menu/scr_menu.yy"
-   },
-   "order": 22,
-   "resourceType": "GMScript",
-   "resourceVersion": "1.0"
+   }
   }
  ],
- "Options": [
+ "resourceType": "GMProject",
+ "resourceVersion": "2.0",
+ "RoomOrderNodes": [
   {
-   "name": "Main",
-   "path": "options/main/options_main.yy",
-   "order": 1
-  },
-  {
-   "name": "Android",
-   "path": "options/android/options_android.yy",
-   "order": 2
+   "roomId": {
+    "name": "rm_game",
+    "path": "rooms/rm_game/rm_game.yy"
+   }
   }
  ],
- "defaultScriptType": 1,
- "folderName": "NEON ECHO",
- "isDnDProject": false,
- "isEcma": false,
- "metaData": {
-  "IDEVersion": "2024.6.1.160",
-  "projectVersion": 1
- },
- "name": "NEON ECHO",
- "resourcesVersion": "1.0",
  "templateType": null,
- "tutorial": ""
+ "TextureGroups": [
+  {
+   "$GMTextureGroup": "",
+   "%Name": "Default",
+   "autocrop": true,
+   "border": 2,
+   "compressFormat": "bz2",
+   "customOptions": "",
+   "directory": "",
+   "groupParent": null,
+   "isScaled": true,
+   "loadType": "default",
+   "mipsToGenerate": 0,
+   "name": "Default",
+   "resourceType": "GMTextureGroup",
+   "resourceVersion": "2.0",
+   "targets": -1
+  }
+ ]
 }
